@@ -1,99 +1,330 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Smart Vertical Parking System</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 20px;
-        }
-        .controls button {
-            margin: 10px;
-            padding: 10px 20px;
-            font-size: 16px;
-        }
-        .lights {
-            display: flex;
-            justify-content: center;
-            margin: 20px 0;
-        }
-        .light {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            margin: 0 10px;
-            opacity: 0.3;
-        }
-        .light.active {
-            opacity: 1;
-        }
-        #green-light { background-color: green; }
-        #yellow-light { background-color: yellow; }
-        #blue-light { background-color: blue; }
-        .parking-blocks {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 30px;
-        }
-        .block {
-            width: 150px;
-            height: 100px;
-            border: 2px solid #333;
-            margin: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Smart Vertical Parking System</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:Arial, sans-serif;
+      background:#eef2f7;
+      overflow:hidden;
+    }
+    h1{
+      text-align:center;
+      margin:10px 0;
+    }
+
+    .panel{
+      text-align:center;
+      margin:10px 0 5px;
+    }
+    .panel button{
+      margin:5px;
+      padding:8px 14px;
+      font-size:14px;
+      cursor:pointer;
+    }
+
+    /* status text */
+    #status{
+      text-align:center;
+      min-height:20px;
+      margin-bottom:5px;
+      font-size:14px;
+    }
+
+    /* road and entry area */
+    .scene{
+      position:relative;
+      width:100vw;
+      height:80vh;
+      background:#cfd8dc;
+      border-top:3px solid #455a64;
+    }
+
+    .entry-road{
+      position:absolute;
+      left:0;
+      bottom:40px;
+      width:55%;
+      height:60px;
+      background:#424242;
+    }
+    .entry-road::before{
+      content:"";
+      position:absolute;
+      top:50%;
+      left:0;
+      right:0;
+      height:4px;
+      background:repeating-linear-gradient(
+        to right,
+        #fafafa 0 20px,
+        transparent 20px 40px
+      );
+      transform:translateY(-50%);
+    }
+
+    /* sensor area */
+    .sensor-zone{
+      position:absolute;
+      left:50%;
+      bottom:40px;
+      transform:translateX(-50%);
+      width:120px;
+      height:60px;
+      border:3px dashed #00c853;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:rgba(200,255,200,0.2);
+    }
+    .sensor-text{
+      font-size:12px;
+      text-align:center;
+    }
+
+    /* vertical lift shaft */
+    .lift-shaft{
+      position:absolute;
+      left:65%;
+      bottom:40px;
+      width:80px;
+      height:260px;
+      border:4px solid #37474f;
+      background:rgba(255,255,255,0.4);
+      display:flex;
+      align-items:flex-end;
+      justify-content:center;
+      padding-bottom:5px;
+    }
+    .lift-platform{
+      width:70px;
+      height:40px;
+      background:#90a4ae;
+      border-radius:4px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+      overflow:visible;
+    }
+
+    /* parking rack (3 blocks) */
+    .rack{
+      position:absolute;
+      left:75%;
+      bottom:150px;
+      width:220px;
+      height:140px;
+      border:3px solid #263238;
+      background:#eceff1;
+      display:flex;
+      justify-content:space-around;
+      align-items:flex-end;
+      padding:5px;
+    }
+    .slot{
+      width:60px;
+      height:100px;
+      border:2px solid #78909c;
+      position:relative;
+      display:flex;
+      align-items:flex-end;
+      justify-content:center;
+      font-size:11px;
+      padding-bottom:3px;
+    }
+    .slot::before{
+      content:"";
+      position:absolute;
+      bottom:0;
+      left:5px;
+      right:5px;
+      height:3px;
+      background:#b0bec5;
+    }
+    #slot-small{background:#e8f5e9;}
+    #slot-sedan{background:#fffde7;}
+    #slot-suv{background:#e3f2fd;}
+
+    /* indicator lights like sensors */
+    .lights{
+      position:absolute;
+      left:50%;
+      top:10px;
+      transform:translateX(-50%);
+      display:flex;
+      gap:10px;
+    }
+    .light{
+      width:14px;
+      height:14px;
+      border-radius:50%;
+      border:2px solid #444;
+      opacity:0.25;
+    }
+    .light.on{opacity:1;}
+    #light-small{background:#00c853;}  /* green */
+    #light-sedan{background:#ffd600;} /* yellow */
+    #light-suv{background:#2962ff;}   /* blue */
+
+    /* car */
+    .car{
+      position:absolute;
+      bottom:48px;
+      left:-80px;
+      width:70px;
+      height:30px;
+      border-radius:6px;
+      background:#f44336;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#fff;
+      font-size:10px;
+      box-shadow:0 4px 4px rgba(0,0,0,0.4);
+    }
+    .car::before,.car::after{
+      content:"";
+      position:absolute;
+      bottom:-8px;
+      width:16px;
+      height:16px;
+      border-radius:50%;
+      background:#212121;
+    }
+    .car::before{left:8px;}
+    .car::after{right:8px;}
+
+    .hidden{display:none;}
+
+    /* animations */
+    @keyframes moveToSensor{
+      from{left:-80px;}
+      to{left:42%;}
+    }
+    @keyframes liftUp{
+      from{bottom:48px;}
+      to{bottom:215px;}
+    }
+    @keyframes moveToRack{
+      from{left:65%;}
+      to{left:82%;}
+    }
+  </style>
 </head>
 <body>
-    <h1>Smart Vertical Parking System</h1>
-    <div class="controls">
-        <button onclick="parkCar('small')">Park Small Car</button>
-        <button onclick="parkCar('sedan')">Park Sedan</button>
-        <button onclick="parkCar('suv')">Park SUV</button>
-    </div>
+  <h1>Smart Vertical Parking System</h1>
+
+  <div class="panel">
+    <button onclick="startParking('small')">Enter Small Car</button>
+    <button onclick="startParking('sedan')">Enter Sedan</button>
+    <button onclick="startParking('suv')">Enter SUV</button>
+  </div>
+
+  <div id="status"></div>
+
+  <div class="scene">
     <div class="lights">
-        <div id="green-light" class="light"></div>
-        <div id="yellow-light" class="light"></div>
-        <div id="blue-light" class="light"></div>
+      <div id="light-small" class="light" title="Small"></div>
+      <div id="light-sedan" class="light" title="Sedan"></div>
+      <div id="light-suv" class="light" title="SUV"></div>
     </div>
-    <div class="parking-blocks">
-        <div class="block" id="small-block">Small Cars</div>
-        <div class="block" id="sedan-block">Sedans</div>
-        <div class="block" id="suv-block">SUVs</div>
+
+    <div class="entry-road"></div>
+
+    <div class="sensor-zone">
+      <div class="sensor-text">
+        Sensor Area<br>(size detection)
+      </div>
     </div>
-    <script>
-        function parkCar(type) {
-            document.querySelectorAll('.light').forEach(light => {
-                light.classList.remove('active');
-            });
-            if (type === 'small') {
-                document.getElementById('green-light').classList.add('active');
-            } else if (type === 'sedan') {
-                document.getElementById('yellow-light').classList.add('active');
-            } else if (type === 'suv') {
-                document.getElementById('blue-light').classList.add('active');
-            }
-            setTimeout(() => {
-                if (type === 'small') {
-                    document.getElementById('small-block').style.backgroundColor = '#d4edda';
-                } else if (type === 'sedan') {
-                    document.getElementById('sedan-block').style.backgroundColor = '#fff3cd';
-                } else if (type === 'suv') {
-                    document.getElementById('suv-block').style.backgroundColor = '#d1ecf1';
-                }
-                setTimeout(() => {
-                    alert(`${type.toUpperCase()} car parked successfully!`);
-                    document.querySelectorAll('.block').forEach(block => {
-                        block.style.backgroundColor = 'transparent';
-                    });
-                }, 1500);
-            }, 1000);
-        }
-    </script>
+
+    <div class="lift-shaft">
+      <div class="lift-platform">
+        <div id="car" class="car hidden">CAR</div>
+      </div>
+    </div>
+
+    <div class="rack">
+      <div id="slot-small" class="slot">Small</div>
+      <div id="slot-sedan" class="slot">Sedan</div>
+      <div id="slot-suv" class="slot">SUV</div>
+    </div>
+  </div>
+
+  <script>
+    const car = document.getElementById("car");
+    const statusBox = document.getElementById("status");
+    const lights = {
+      small: document.getElementById("light-small"),
+      sedan: document.getElementById("light-sedan"),
+      suv: document.getElementById("light-suv")
+    };
+    const slots = {
+      small: document.getElementById("slot-small"),
+      sedan: document.getElementById("slot-sedan"),
+      suv: document.getElementById("slot-suv")
+    };
+    let busy = false;
+
+    function resetLights(){
+      Object.values(lights).forEach(l=>l.classList.remove("on"));
+    }
+
+    function startParking(type){
+      if(busy) return;
+      busy = true;
+      resetLights();
+      statusBox.textContent = "Car entering...";
+
+      // reset car
+      car.className = "car";
+      car.textContent = type.toUpperCase();
+      car.style.left = "-80px";
+      car.style.bottom = "48px";
+
+      // step 1: car moves to sensor
+      car.style.animation = "moveToSensor 2s linear forwards";
+
+      setTimeout(()=>{
+        statusBox.textContent = "Sensor detecting size...";
+        // simulate sensor classification
+        resetLights();
+        if(type === "small") lights.small.classList.add("on");
+        if(type === "sedan") lights.sedan.classList.add("on");
+        if(type === "suv") lights.suv.classList.add("on");
+
+        setTimeout(()=>{
+          statusBox.textContent = "Servo moving car onto vertical lift...";
+          // snap car to lift base
+          car.style.animation = "";
+          car.style.left = "65%";
+          // step 2: lift up
+          car.style.animation = "liftUp 2s ease-out forwards";
+
+          setTimeout(()=>{
+            statusBox.textContent = "Servo moving car to parking slot...";
+            // step 3: move horizontally to rack
+            car.style.animation = "";
+            car.style.bottom = "215px";
+            car.style.animation = "moveToRack 2s linear forwards";
+
+            setTimeout(()=>{
+              // snap into correct slot visually
+              car.style.animation = "";
+              car.style.left = "0";
+              car.style.position = "relative";
+              car.style.bottom = "0";
+              slots[type].appendChild(car);
+              statusBox.textContent = "Car parked in " + type.toUpperCase() + " slot.";
+              busy = false;
+            },2000);
+          },2000);
+        },1300);
+      },2000);
+    }
+  </script>
 </body>
 </html>
