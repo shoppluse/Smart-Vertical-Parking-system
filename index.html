@@ -2,360 +2,391 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Smart Vertical Parking System</title>
+  <title>TradeLens AI – Chart Analyzer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{
-      font-family:Arial, sans-serif;
-      background:#eef2f7;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:#050816;
+      color:#e5e7eb;
+      height:100vh;
+      display:flex;
+      flex-direction:column;
+    }
+    header{
+      padding:10px 16px;
+      border-bottom:1px solid #111827;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      background:rgba(15,23,42,0.95);
+      backdrop-filter:blur(10px);
+      position:sticky;
+      top:0;
+      z-index:10;
+    }
+    header h1{
+      font-size:18px;
+      font-weight:600;
+    }
+    header span{
+      font-size:11px;
+      color:#9ca3af;
+    }
+
+    .layout{
+      flex:1;
+      display:flex;
+      gap:12px;
+      padding:12px;
       overflow:hidden;
     }
-    h1{text-align:center;margin:10px 0;}
-
-    .panel{text-align:center;margin:10px 0 5px;}
-    .panel button{
-      margin:5px;
-      padding:8px 14px;
-      font-size:14px;
-      cursor:pointer;
+    @media(max-width:900px){
+      .layout{
+        flex-direction:column;
+      }
     }
 
-    #status{text-align:center;min-height:20px;margin-bottom:5px;font-size:14px;}
-
-    .scene{
-      position:relative;
-      width:100vw;
-      height:80vh;
-      background:#cfd8dc;
-      border-top:3px solid #455a64;
-    }
-
-    .entry-road{
-      position:absolute;
-      left:0;
-      bottom:40px;
-      width:55%;
-      height:60px;
-      background:#424242;
-    }
-    .entry-road::before{
-      content:"";
-      position:absolute;
-      top:50%;
-      left:0;right:0;
-      height:4px;
-      background:repeating-linear-gradient(
-        to right,
-        #fafafa 0 20px,
-        transparent 20px 40px
-      );
-      transform:translateY(-50%);
-    }
-
-    .sensor-zone{
-      position:absolute;
-      left:50%;
-      bottom:40px;
-      transform:translateX(-50%);
-      width:120px;
-      height:60px;
-      border:3px dashed #00c853;
+    /* LEFT PANEL – upload & preview */
+    .left-panel{
+      flex:1;
+      background:#020617;
+      border-radius:12px;
+      border:1px solid #1f2937;
+      padding:12px;
       display:flex;
-      align-items:center;
-      justify-content:center;
-      background:rgba(200,255,200,0.2);
-    }
-    .sensor-text{font-size:12px;text-align:center;}
-
-    .lift-shaft{
-      position:absolute;
-      left:65%;
-      bottom:40px;
-      width:80px;
-      height:260px;
-      border:4px solid #37474f;
-      background:rgba(255,255,255,0.4);
-      display:flex;
-      align-items:flex-end;
-      justify-content:center;
-      padding-bottom:5px;
-    }
-    .lift-platform{
-      width:70px;
-      height:40px;
-      background:#90a4ae;
-      border-radius:4px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      position:relative;
-      overflow:visible;
-    }
-
-    .rack{
-      position:absolute;
-      left:75%;
-      bottom:150px;
-      width:220px;
-      height:140px;
-      border:3px solid #263238;
-      background:#eceff1;
-      display:flex;
-      justify-content:space-around;
-      align-items:flex-end;
-      padding:5px;
-    }
-    .slot{
-      width:60px;
-      height:100px;
-      border:2px solid #78909c;
-      position:relative;
-      display:flex;
-      align-items:flex-end;
-      justify-content:center;
-      font-size:11px;
-      padding-bottom:3px;
-    }
-    .slot::before{
-      content:"";
-      position:absolute;
-      bottom:0;
-      left:5px;right:5px;
-      height:3px;
-      background:#b0bec5;
-    }
-    #slot-small{background:#e8f5e9;}
-    #slot-sedan{background:#fffde7;}
-    #slot-suv{background:#e3f2fd;}
-
-    .lights{
-      position:absolute;
-      left:50%;
-      top:10px;
-      transform:translateX(-50%);
-      display:flex;
+      flex-direction:column;
       gap:10px;
+      min-height:0;
     }
-    .light{
-      width:14px;
-      height:14px;
-      border-radius:50%;
-      border:2px solid #444;
-      opacity:0.25;
+    .panel-title{
+      font-size:13px;
+      font-weight:600;
+      margin-bottom:4px;
     }
-    .light.on{opacity:1;}
-    #light-small{background:#00c853;}
-    #light-sedan{background:#ffd600;}
-    #light-suv{background:#2962ff;}
+    .panel-sub{
+      font-size:11px;
+      color:#9ca3af;
+    }
 
-    /* BASE CAR SHAPE (SMALL = 1x) */
-    .car{
-      position:absolute;
-      bottom:48px;
-      left:-80px;
-      width:60px;   /* base length */
-      height:24px;
+    .upload-box{
+      border:1px dashed #4b5563;
+      border-radius:10px;
+      padding:12px;
+      background:radial-gradient(circle at top,#111827 0,#020617 55%);
       display:flex;
-      align-items:flex-end;
+      flex-direction:column;
+      align-items:center;
       justify-content:center;
-      font-size:8px;
-      color:#fff;
-      transform-origin:center;
+      text-align:center;
+      gap:8px;
     }
-    .car-body{
+    .upload-icon{
+      width:40px;
+      height:40px;
+      border-radius:999px;
+      border:1px solid #374151;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:22px;
+      color:#38bdf8;
+      background:rgba(15,23,42,0.9);
+    }
+    .upload-box label{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:6px 12px;
+      font-size:12px;
+      border-radius:999px;
+      border:1px solid #38bdf8;
+      color:#e5e7eb;
+      cursor:pointer;
+      background:linear-gradient(135deg,#0ea5e9,#6366f1);
+    }
+    .upload-box input[type="file"]{
+      display:none;
+    }
+    .hint{
+      font-size:10px;
+      color:#9ca3af;
+    }
+
+    .preview-wrap{
+      flex:1;
+      min-height:0;
+      border-radius:10px;
+      overflow:hidden;
+      border:1px solid #111827;
+      background:#020617;
+      display:flex;
+      align-items:center;
+      justify-content:center;
       position:relative;
-      width:100%;
-      height:18px;
-      border-radius:6px 6px 4px 4px;
     }
-    .car-top{
-      position:absolute;
-      left:16px;
-      right:14px;
-      top:-8px;
-      height:12px;
-      border-radius:10px 10px 4px 4px;
-      background:rgba(255,255,255,0.25);
+    .preview-wrap.empty::before{
+      content:"Chart preview will appear here";
+      font-size:11px;
+      color:#6b7280;
     }
-    .wheel{
-      position:absolute;
-      bottom:-6px;
-      width:12px;
-      height:12px;
-      border-radius:50%;
-      background:#212121;
-    }
-    .wheel.left{left:6px;}
-    .wheel.right{right:6px;}
-
-    /* SMALL HATCHBACK (1x) */
-    .car-small .car-body{
-      background:#ff5252;
-    }
-    .car-small .car-top{
-      left:18px;
-      right:22px;
+    #preview-img{
+      max-width:100%;
+      max-height:100%;
+      object-fit:contain;
+      display:none;
     }
 
-    /* SEDAN – 1.5x length */
-    .car-sedan{
-      width:90px;   /* 1.5 * 60 */
+    /* RIGHT PANEL – chat */
+    .right-panel{
+      flex:1.2;
+      background:#020617;
+      border-radius:12px;
+      border:1px solid #1f2937;
+      padding:12px;
+      display:flex;
+      flex-direction:column;
+      min-height:0;
     }
-    .car-sedan .car-body{
-      background:#ff9800;
-      border-radius:6px 10px 4px 4px;
+    .chat-window{
+      flex:1;
+      overflow-y:auto;
+      padding-right:4px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      font-size:12px;
     }
-    .car-sedan .car-top{
-      left:20px;
-      right:30px;
+    .bubble{
+      max-width:90%;
+      padding:8px 10px;
+      border-radius:10px;
+      line-height:1.4;
+      white-space:pre-wrap;
+    }
+    .user-bubble{
+      margin-left:auto;
+      background:#0f172a;
+      border:1px solid #1e293b;
+    }
+    .ai-bubble{
+      margin-right:auto;
+      background:#020617;
+      border:1px solid #111827;
+    }
+    .tag{
+      display:inline-block;
+      font-size:10px;
+      padding:2px 6px;
+      border-radius:999px;
+      background:#0f172a;
+      color:#9ca3af;
+      margin-bottom:4px;
     }
 
-    /* SUV – 2x length and taller */
-    .car-suv{
-      width:120px;  /* 2 * 60 */
+    .chat-input-row{
+      margin-top:8px;
+      display:flex;
+      gap:6px;
+      align-items:flex-end;
     }
-    .car-suv .car-body{
-      background:#3f51b5;
-      height:22px;
-      border-radius:4px;
-      box-shadow:0 -3px 0 rgba(255,255,255,0.25) inset;
+    .chat-input-row textarea{
+      flex:1;
+      resize:none;
+      min-height:42px;
+      max-height:90px;
+      padding:8px;
+      border-radius:8px;
+      border:1px solid #1f2937;
+      background:#020617;
+      color:#e5e7eb;
+      font-size:12px;
+      outline:none;
     }
-    .car-suv .car-top{
-      left:20px;
-      right:26px;
-      top:-10px;
-      height:14px;
+    .chat-input-row button{
+      padding:8px 14px;
+      border-radius:999px;
+      border:none;
+      background:linear-gradient(135deg,#22c55e,#16a34a);
+      color:#f9fafb;
+      font-size:12px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      gap:6px;
+      white-space:nowrap;
+    }
+    .chat-input-row button[disabled]{
+      opacity:0.6;
+      cursor:not-allowed;
     }
 
-    .hidden{display:none;}
-
-    @keyframes moveToSensor{
-      from{left:-80px;}
-      to{left:42%;}
-    }
-    @keyframes liftUp{
-      from{bottom:48px;}
-      to{bottom:215px;}
-    }
-    @keyframes moveToRack{
-      from{left:65%;}
-      to{left:82%;}
+    .status{
+      margin-top:4px;
+      font-size:10px;
+      color:#9ca3af;
+      min-height:14px;
     }
   </style>
 </head>
 <body>
-  <h1>Smart Vertical Parking System</h1>
-
-  <div class="panel">
-    <button onclick="startParking('small')">Enter Small Car</button>
-    <button onclick="startParking('sedan')">Enter Sedan</button>
-    <button onclick="startParking('suv')">Enter SUV</button>
-  </div>
-
-  <div id="status"></div>
-
-  <div class="scene">
-    <div class="lights">
-      <div id="light-small" class="light" title="Small"></div>
-      <div id="light-sedan" class="light" title="Sedan"></div>
-      <div id="light-suv" class="light" title="SUV"></div>
+  <header>
+    <div>
+      <h1>TradeLens AI</h1>
+      <span>Upload a chart · Ask anything · Get structured analysis</span>
     </div>
+  </header>
 
-    <div class="entry-road"></div>
-
-    <div class="sensor-zone">
-      <div class="sensor-text">
-        Sensor Area<br>(size detection)
+  <div class="layout">
+    <!-- LEFT: upload panel -->
+    <section class="left-panel">
+      <div>
+        <div class="panel-title">Chart upload</div>
+        <div class="panel-sub">Upload candlestick or line chart screenshots (PNG / JPG).</div>
       </div>
-    </div>
 
-    <div class="lift-shaft">
-      <div class="lift-platform">
-        <div id="car" class="car hidden">
-          <div class="car-body">
-            <div class="car-top"></div>
-            <div class="wheel left"></div>
-            <div class="wheel right"></div>
-          </div>
+      <div class="upload-box">
+        <div class="upload-icon">📈</div>
+        <div style="font-size:12px;margin-bottom:4px;">
+          Drop a chart here or choose a file
+        </div>
+        <label for="chart-input">Choose image</label>
+        <input id="chart-input" type="file" accept="image/*">
+        <div class="hint">Image never leaves your browser unless you click “Analyze”.</div>
+      </div>
+
+      <div class="preview-wrap empty">
+        <img id="preview-img" alt="Chart preview">
+      </div>
+    </section>
+
+    <!-- RIGHT: chat / analysis -->
+    <section class="right-panel">
+      <div>
+        <div class="panel-title">AI chart analysis</div>
+        <div class="panel-sub">
+          Ask about trend, support/resistance, patterns, and possible trade ideas.
         </div>
       </div>
-    </div>
 
-    <div class="rack">
-      <div id="slot-small" class="slot">Small</div>
-      <div id="slot-sedan" class="slot">Sedan</div>
-      <div id="slot-suv" class="slot">SUV</div>
-    </div>
+      <div id="chat-window" class="chat-window">
+        <div class="bubble ai-bubble">
+          <div class="tag">AI</div>
+          Upload a trading chart on the left, then describe what you want:
+          for example “Explain current trend and key levels” or
+          “Is there a breakout setup forming?”.
+        </div>
+      </div>
+
+      <div class="chat-input-row">
+        <textarea id="prompt" placeholder="Ask anything about the uploaded chart..."></textarea>
+        <button id="send-btn">
+          Analyze
+          <span>➤</span>
+        </button>
+      </div>
+      <div id="status" class="status"></div>
+    </section>
   </div>
 
   <script>
-    const car = document.getElementById("car");
-    const statusBox = document.getElementById("status");
-    const lights = {
-      small: document.getElementById("light-small"),
-      sedan: document.getElementById("light-sedan"),
-      suv: document.getElementById("light-suv")
-    };
-    const slots = {
-      small: document.getElementById("slot-small"),
-      sedan: document.getElementById("slot-sedan"),
-      suv: document.getElementById("slot-suv")
-    };
-    let busy = false;
+    const chartInput = document.getElementById('chart-input');
+    const previewImg = document.getElementById('preview-img');
+    const previewWrap = document.querySelector('.preview-wrap');
+    const chatWindow = document.getElementById('chat-window');
+    const promptEl = document.getElementById('prompt');
+    const sendBtn = document.getElementById('send-btn');
+    const statusEl = document.getElementById('status');
 
-    function resetLights(){
-      Object.values(lights).forEach(l=>l.classList.remove("on"));
+    let currentImageFile = null;
+
+    // image upload + preview
+    chartInput.addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file.');
+        return;
+      }
+      currentImageFile = file;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        previewImg.src = ev.target.result;
+        previewImg.style.display = 'block';
+        previewWrap.classList.remove('empty');
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // helper to append chat bubbles
+    function addBubble(text, from) {
+      const div = document.createElement('div');
+      div.className = 'bubble ' + (from === 'user' ? 'user-bubble' : 'ai-bubble');
+      const tag = document.createElement('div');
+      tag.className = 'tag';
+      tag.textContent = from === 'user' ? 'You' : 'AI';
+      div.appendChild(tag);
+      const body = document.createElement('div');
+      body.textContent = text;
+      div.appendChild(body);
+      chatWindow.appendChild(div);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
     }
 
-    function startParking(type){
-      if(busy) return;
-      busy = true;
-      resetLights();
-      statusBox.textContent = "Car entering...";
+    // send prompt + image to backend
+    async function handleSend() {
+      const prompt = promptEl.value.trim();
+      if (!prompt) {
+        alert('Type a question about the chart.');
+        return;
+      }
+      if (!currentImageFile) {
+        alert('Upload a chart image first.');
+        return;
+      }
 
-      // apply type-specific style
-      car.className = "car car-" + type;
-      car.style.position = "absolute";
-      car.style.left = "-80px";
-      car.style.bottom = "48px";
+      addBubble(prompt, 'user');
+      promptEl.value = '';
+      sendBtn.disabled = true;
+      statusEl.textContent = 'Analyzing chart with AI...';
 
-      // step 1: move to sensor
-      car.style.animation = "moveToSensor 2s linear forwards";
+      try {
+        const formData = new FormData();
+        formData.append('image', currentImageFile);
+        formData.append('prompt', prompt);
 
-      setTimeout(()=>{
-        statusBox.textContent = "Sensor detecting size...";
-        resetLights();
-        if(type === "small") lights.small.classList.add("on");
-        if(type === "sedan") lights.sedan.classList.add("on");
-        if(type === "suv") lights.suv.classList.add("on");
+        // TODO: replace with your real backend endpoint
+        const response = await fetch('https://your-backend.example.com/analyze-chart', {
+          method: 'POST',
+          body: formData
+        });
 
-        setTimeout(()=>{
-          statusBox.textContent = "Servo moving car onto vertical lift...";
-          car.style.animation = "";
-          car.style.left = "65%";
+        if (!response.ok) {
+          throw new Error('Server error ' + response.status);
+        }
 
-          // step 2: lift up
-          car.style.animation = "liftUp 2s ease-out forwards";
-
-          setTimeout(()=>{
-            statusBox.textContent = "Servo moving car to parking slot...";
-            car.style.animation = "";
-            car.style.bottom = "215px";
-            car.style.animation = "moveToRack 2s linear forwards";
-
-            setTimeout(()=>{
-              car.style.animation = "";
-              car.style.position = "relative";
-              car.style.left = "0";
-              car.style.bottom = "0";
-              slots[type].appendChild(car);
-              statusBox.textContent = "Car parked in " + type.toUpperCase() + " slot.";
-              busy = false;
-            },2000);
-          },2000);
-        },1300);
-      },2000);
+        const data = await response.json();
+        const answer = data.analysis || data.answer || JSON.stringify(data, null, 2);
+        addBubble(answer, 'ai');
+        statusEl.textContent = '';
+      } catch (err) {
+        console.error(err);
+        addBubble('There was an error contacting the analysis server. Please try again later.', 'ai');
+        statusEl.textContent = 'Error: ' + err.message;
+      } finally {
+        sendBtn.disabled = false;
+      }
     }
+
+    sendBtn.addEventListener('click', handleSend);
+    promptEl.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleSend();
+      }
+    });
   </script>
 </body>
-</html>
+        </html>
+  
