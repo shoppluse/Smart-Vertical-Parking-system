@@ -148,58 +148,58 @@
     #light-sedan{background:#ffd600;}
     #light-suv{background:#2962ff;}
 
-    /* BASE CAR SHAPE (body + wheels) */
+    /* BASE CAR SHAPE (SMALL = 1x) */
     .car{
       position:absolute;
       bottom:48px;
       left:-80px;
-      width:80px;
-      height:30px;
+      width:60px;   /* base length */
+      height:24px;
       display:flex;
       align-items:flex-end;
       justify-content:center;
-      font-size:9px;
+      font-size:8px;
       color:#fff;
       transform-origin:center;
     }
     .car-body{
       position:relative;
       width:100%;
-      height:22px;
+      height:18px;
       border-radius:6px 6px 4px 4px;
     }
     .car-top{
       position:absolute;
-      left:18px;
-      right:15px;
-      top:-10px;
-      height:14px;
+      left:16px;
+      right:14px;
+      top:-8px;
+      height:12px;
       border-radius:10px 10px 4px 4px;
       background:rgba(255,255,255,0.25);
     }
     .wheel{
       position:absolute;
-      bottom:-8px;
-      width:16px;
-      height:16px;
+      bottom:-6px;
+      width:12px;
+      height:12px;
       border-radius:50%;
       background:#212121;
     }
-    .wheel.left{left:8px;}
-    .wheel.right{right:8px;}
+    .wheel.left{left:6px;}
+    .wheel.right{right:6px;}
 
-    /* SMALL HATCHBACK */
+    /* SMALL HATCHBACK (1x) */
     .car-small .car-body{
       background:#ff5252;
     }
     .car-small .car-top{
-      left:20px;
-      right:25px;
+      left:18px;
+      right:22px;
     }
 
-    /* SEDAN – longer rear boot */
+    /* SEDAN – 1.5x length */
     .car-sedan{
-      width:90px;
+      width:90px;   /* 1.5 * 60 */
     }
     .car-sedan .car-body{
       background:#ff9800;
@@ -210,21 +210,21 @@
       right:30px;
     }
 
-    /* SUV – higher, boxy */
+    /* SUV – 2x length and taller */
     .car-suv{
-      width:85px;
+      width:120px;  /* 2 * 60 */
     }
     .car-suv .car-body{
       background:#3f51b5;
-      height:24px;
+      height:22px;
       border-radius:4px;
       box-shadow:0 -3px 0 rgba(255,255,255,0.25) inset;
     }
     .car-suv .car-top{
-      left:15px;
-      right:20px;
-      top:-12px;
-      height:16px;
+      left:20px;
+      right:26px;
+      top:-10px;
+      height:14px;
     }
 
     .hidden{display:none;}
@@ -313,7 +313,7 @@
       resetLights();
       statusBox.textContent = "Car entering...";
 
-      // add type-specific 3D style
+      // apply type-specific style
       car.className = "car car-" + type;
       car.style.position = "absolute";
       car.style.left = "-80px";
