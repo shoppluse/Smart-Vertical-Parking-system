@@ -2,77 +2,189 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Nifty 50 & Sensex – Live Charts</title>
+  <title>Market Prep – Nifty & Sensex</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{
       font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
       background:#f8f7f3;
+      color:#111827;
       height:100vh;
       display:flex;
       flex-direction:column;
     }
     header{
-      height:44px;
+      height:46px;
       display:flex;
       align-items:center;
       justify-content:center;
-      font-size:14px;
-      font-weight:500;
-      color:#4b5563;
       border-bottom:1px solid #e5e7eb;
       background:#fafaf5;
+      font-size:14px;
+      font-weight:500;
     }
-    .grid{
+    header span{
+      font-size:11px;
+      color:#6b7280;
+      margin-left:6px;
+    }
+
+    .top-summary{
+      padding:8px 10px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      border-bottom:1px solid #e5e7eb;
+      background:#fcfbf7;
+      font-size:11px;
+    }
+    .badge{
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid #e5e7eb;
+      background:#fff;
+      display:flex;
+      align-items:center;
+      gap:4px;
+    }
+    .badge strong{font-weight:600;}
+    .badge span{color:#6b7280;}
+
+    .layout{
       flex:1;
       display:flex;
       flex-direction:row;
+      min-height:0;
     }
     .panel{
       flex:1;
       border-right:1px solid #e5e7eb;
       display:flex;
       flex-direction:column;
+      min-height:0;
     }
-    .panel:last-child{
-      border-right:none;
-    }
+    .panel:last-child{border-right:none;}
     .panel-header{
       padding:6px 10px;
       font-size:13px;
       font-weight:500;
       background:#f3f4f6;
       border-bottom:1px solid #e5e7eb;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
     }
-    .chart-container{
+    .panel-header a{
+      font-size:11px;
+      color:#2563eb;
+      text-decoration:none;
+    }
+    .panel-header a:hover{text-decoration:underline;}
+
+    .chart-box{
       flex:1;
+      min-height:0;
     }
+
+    .info-card{
+      padding:8px 10px 10px;
+      font-size:11px;
+      border-top:1px solid #e5e7eb;
+      background:#fcfbf7;
+    }
+    .info-card h3{
+      font-size:12px;
+      margin-bottom:4px;
+      font-weight:600;
+    }
+    .info-card ul{
+      list-style:disc;
+      margin-left:16px;
+      margin-top:4px;
+      color:#4b5563;
+    }
+    .info-card li{margin-bottom:2px;}
+
     @media(max-width:800px){
-      .grid{
-        flex-direction:column;
-      }
+      .layout{flex-direction:column;}
       .panel{
         border-right:none;
         border-bottom:1px solid #e5e7eb;
         height:50vh;
       }
-      .panel:last-child{
-        border-bottom:none;
-      }
+      .panel:last-child{border-bottom:none;}
+    }
+
+    /* bottom quick-note bar for your thoughts before trade */
+    .bottom-notes{
+      border-top:1px solid #e5e7eb;
+      background:#fafaf5;
+      padding:8px 10px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .bottom-notes label{
+      font-size:11px;
+      color:#6b7280;
+    }
+    .bottom-notes textarea{
+      width:100%;
+      min-height:42px;
+      max-height:80px;
+      resize:vertical;
+      padding:6px 8px;
+      border-radius:8px;
+      border:1px solid #e5e7eb;
+      font-size:12px;
+      outline:none;
+      background:#ffffff;
     }
   </style>
 </head>
 <body>
   <header>
-    Nifty 50 &amp; BSE Sensex – Live View
+    Market Prep
+    <span>Quick view of Nifty 50 &amp; Sensex before taking a trade</span>
   </header>
 
-  <div class="grid">
+  <!-- Static snapshot based on NSE stats you shared -->
+  <section class="top-summary">
+    <div class="badge">
+      <strong>Stocks traded</strong><span>3,199</span>
+    </div>
+    <div class="badge">
+      <strong>Advances</strong><span>1,383</span>
+    </div>
+    <div class="badge">
+      <strong>Declines</strong><span>1,714</span>
+    </div>
+    <div class="badge">
+      <strong>52W High</strong><span>82</span>
+    </div>
+    <div class="badge">
+      <strong>52W Low</strong><span>138</span>
+    </div>
+    <div class="badge">
+      <strong>Market cap</strong><span>₹ 473.88L Cr · $5.34T</span>
+    </div>
+    <div class="badge">
+      <strong>Turnover (Equity)</strong><span>₹ 96,628 Cr</span>
+    </div>
+    <div class="badge">
+      <strong>Date</strong><span>20‑Nov‑2025</span>
+    </div>
+  </section>
+
+  <main class="layout">
     <!-- LEFT: Nifty 50 -->
     <section class="panel">
-      <div class="panel-header">Nifty 50 (NSE)</div>
-      <div class="chart-container">
+      <div class="panel-header">
+        <span>Nifty 50 (NSE)</span>
+        <a href="https://www.nseindia.com" target="_blank" rel="noopener noreferrer">Open NSE site</a>
+      </div>
+      <div class="chart-box">
         <!-- TradingView Widget BEGIN -->
         <div class="tradingview-widget-container">
           <div id="nifty_chart"></div>
@@ -82,7 +194,7 @@
               "container_id": "nifty_chart",
               "width": "100%",
               "height": "100%",
-              "symbol": "NSE:NIFTY",       // Nifty 50 index [web:134][web:143]
+              "symbol": "NSE:NIFTY",      // Nifty 50 index, not Apple [web:134][web:143]
               "interval": "60",
               "timezone": "Asia/Kolkata",
               "theme": "light",
@@ -97,12 +209,26 @@
         </div>
         <!-- TradingView Widget END -->
       </div>
+      <div class="info-card">
+        <h3>Nifty – pre‑trade checklist</h3>
+        <ul>
+          <li>Check daily &amp; 1‑hour trend (higher highs/lows or range).</li>
+          <li>Mark yesterday high/low and current day opening range.</li>
+          <li>Note nearest support &amp; resistance zones before planning entries.</li>
+          <li>Avoid aggressive trades near key events or gap‑up/gap‑down opens.</li>
+        </ul>
+      </div>
     </section>
 
     <!-- RIGHT: Sensex -->
     <section class="panel">
-      <div class="panel-header">BSE Sensex</div>
-      <div class="chart-container">
+      <div class="panel-header">
+        <span>Sensex (BSE)</span>
+        <a href="https://www.bseindia.com/sensex/code/16/" target="_blank" rel="noopener noreferrer">
+          Open BSE Sensex
+        </a>
+      </div>
+      <div class="chart-box">
         <!-- TradingView Widget BEGIN -->
         <div class="tradingview-widget-container">
           <div id="sensex_chart"></div>
@@ -111,7 +237,7 @@
               "container_id": "sensex_chart",
               "width": "100%",
               "height": "100%",
-              "symbol": "BSE:SENSEX",     // Sensex index [web:143]
+              "symbol": "BSE:SENSEX",    // BSE Sensex index [web:143]
               "interval": "60",
               "timezone": "Asia/Kolkata",
               "theme": "light",
@@ -126,7 +252,22 @@
         </div>
         <!-- TradingView Widget END -->
       </div>
+      <div class="info-card">
+        <h3>Sensex – pre‑trade checklist</h3>
+        <ul>
+          <li>Compare Sensex trend with Nifty to confirm market bias.</li>
+          <li>Watch for divergence (one index strong, other weak).</li>
+          <li>Track banking &amp; heavyweight stocks driving the move.</li>
+          <li>Avoid trades if both indices are choppy and overlapping.</li>
+        </ul>
+      </div>
     </section>
-  </div>
+  </main>
+
+  <!-- Your own notes / plan area -->
+  <section class="bottom-notes">
+    <label for="notes">Your plan before entering any trade (write key points):</label>
+    <textarea id="notes" placeholder="Example: Market biased bullish above yesterday high; I will only look for pullback longs with tight risk..."></textarea>
+  </section>
 </body>
 </html>
