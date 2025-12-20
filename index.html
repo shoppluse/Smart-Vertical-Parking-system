@@ -1,273 +1,262 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Market Prep – Nifty & Sensex</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>Where market knowledge begins</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#f7f5ef;
+      --card:#f3f1eb;
+      --border:#e2dfd5;
+      --text-main:#3f3a33;
+      --text-sub:#948f86;
+    }
     body{
-      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      background:#f8f7f3;
-      color:#111827;
-      height:100vh;
+      font-family: system-ui,-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;
+      background:var(--bg);
+      color:var(--text-main);
+      min-height:100vh;
       display:flex;
       flex-direction:column;
     }
-    header{
-      height:46px;
+
+    /* top bar like Perplexity app (avatar + logo + share) */
+    .top-bar{
+      height:44px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:0 12px;
+    }
+    .top-left{
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .avatar{
+      width:26px;
+      height:26px;
+      border-radius:999px;
+      background:#d1c9bc;
+      overflow:hidden;
+    }
+    .logo-text{
+      font-size:13px;
+      font-weight:500;
+      color:#6b6965;
+    }
+    .top-right{
+      width:26px;
+      height:26px;
+      border-radius:999px;
+      border:1px solid #d4d0c6;
       display:flex;
       align-items:center;
       justify-content:center;
-      border-bottom:1px solid #e5e7eb;
-      background:#fafaf5;
       font-size:14px;
-      font-weight:500;
-    }
-    header span{
-      font-size:11px;
-      color:#6b7280;
-      margin-left:6px;
+      color:#7b776e;
+      background:#f9f7f1;
     }
 
-    .top-summary{
-      padding:8px 10px;
+    /* center hero with geometric pattern */
+    .hero{
+      flex:1;
       display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      border-bottom:1px solid #e5e7eb;
-      background:#fcfbf7;
-      font-size:11px;
+      align-items:center;
+      justify-content:center;
+      padding:0 24px 70px; /* extra bottom space for input */
+      position:relative;
+      overflow:hidden;
     }
-    .badge{
-      padding:4px 8px;
+    .hero-pattern{
+      position:absolute;
+      inset:0;
+      opacity:0.35;
+      background-image:
+        linear-gradient(90deg,#e9e4d7 1px,transparent 1px),
+        linear-gradient(#e9e4d7 1px,transparent 1px);
+      background-size:80px 80px;
+      mask-image:radial-gradient(circle at center,rgba(0,0,0,0.9),transparent 75%);
+      pointer-events:none;
+    }
+    .hero-inner{
+      position:relative;
+      text-align:center;
+    }
+    .hero-icon{
+      width:40px;
+      height:40px;
       border-radius:999px;
-      border:1px solid #e5e7eb;
-      background:#fff;
+      border:1px solid #ddd4c1;
+      margin:0 auto 10px;
       display:flex;
       align-items:center;
-      gap:4px;
+      justify-content:center;
+      font-size:22px;
+      color:#a0937a;
+      background:radial-gradient(circle at top,#f7f3ea,#ece3d0);
     }
-    .badge strong{font-weight:600;}
-    .badge span{color:#6b7280;}
+    .hero-title{
+      font-size:18px;
+      letter-spacing:0.06em;
+      text-transform:uppercase;
+      color:#a1988a;
+    }
 
-    .layout{
-      flex:1;
-      display:flex;
-      flex-direction:row;
-      min-height:0;
+    /* scrollable content placeholder (optional) */
+    .content{
+      position:absolute;
+      inset:80px 0 80px;
+      overflow-y:auto;
+      padding:0 18px;
+      text-align:left;
+      pointer-events:none; /* currently just placeholder */
     }
-    .panel{
-      flex:1;
-      border-right:1px solid #e5e7eb;
-      display:flex;
-      flex-direction:column;
-      min-height:0;
+    .content p{
+      font-size:12px;
+      color:#a19a8f;
+      margin-bottom:6px;
     }
-    .panel:last-child{border-right:none;}
-    .panel-header{
-      padding:6px 10px;
-      font-size:13px;
-      font-weight:500;
-      background:#f3f4f6;
-      border-bottom:1px solid #e5e7eb;
+
+    /* bottom ask bar fixed */
+    .bottom-shell{
+      position:fixed;
+      left:0;
+      right:0;
+      bottom:0;
+      padding:8px 12px 12px;
+      background:linear-gradient(to top,rgba(247,245,239,0.98),rgba(247,245,239,0.7),transparent);
+      backdrop-filter:blur(8px);
+    }
+    .ask-row{
       display:flex;
-      justify-content:space-between;
       align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:#f8f5ee;
+      box-shadow:0 4px 10px rgba(0,0,0,0.02);
     }
-    .panel-header a{
-      font-size:11px;
-      color:#2563eb;
-      text-decoration:none;
-    }
-    .panel-header a:hover{text-decoration:underline;}
-
-    .chart-box{
-      flex:1;
-      min-height:0;
-    }
-
-    .info-card{
-      padding:8px 10px 10px;
-      font-size:11px;
-      border-top:1px solid #e5e7eb;
-      background:#fcfbf7;
-    }
-    .info-card h3{
-      font-size:12px;
-      margin-bottom:4px;
-      font-weight:600;
-    }
-    .info-card ul{
-      list-style:disc;
-      margin-left:16px;
-      margin-top:4px;
-      color:#4b5563;
-    }
-    .info-card li{margin-bottom:2px;}
-
-    @media(max-width:800px){
-      .layout{flex-direction:column;}
-      .panel{
-        border-right:none;
-        border-bottom:1px solid #e5e7eb;
-        height:50vh;
-      }
-      .panel:last-child{border-bottom:none;}
-    }
-
-    /* bottom quick-note bar for your thoughts before trade */
-    .bottom-notes{
-      border-top:1px solid #e5e7eb;
-      background:#fafaf5;
-      padding:8px 10px;
+    .pill-btn{
+      width:30px;
+      height:30px;
+      border-radius:999px;
+      border:1px solid #d6d0c3;
+      background:#f4f1ea;
       display:flex;
-      flex-direction:column;
-      gap:6px;
+      align-items:center;
+      justify-content:center;
+      font-size:16px;
+      color:#7b776e;
+      flex-shrink:0;
     }
-    .bottom-notes label{
-      font-size:11px;
-      color:#6b7280;
-    }
-    .bottom-notes textarea{
-      width:100%;
-      min-height:42px;
-      max-height:80px;
-      resize:vertical;
-      padding:6px 8px;
-      border-radius:8px;
-      border:1px solid #e5e7eb;
-      font-size:12px;
+    .ask-input{
+      flex:1;
+      border:none;
       outline:none;
-      background:#ffffff;
+      background:transparent;
+      font-size:14px;
+      color:var(--text-main);
+    }
+    .ask-input::placeholder{
+      color:#a7a197;
+    }
+    .mic-btn{
+      width:30px;
+      height:30px;
+      border-radius:999px;
+      border:none;
+      background:#151515;
+      color:#f9f7f2;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:15px;
+      flex-shrink:0;
+    }
+
+    /* bottom nav icons */
+    .bottom-nav{
+      margin-top:6px;
+      display:flex;
+      justify-content:center;
+      gap:28px;
+      font-size:18px;
+      color:#a39e95;
     }
   </style>
 </head>
 <body>
-  <header>
-    Market Prep
-    <span>Quick view of Nifty 50 &amp; Sensex before taking a trade</span>
+  <!-- top bar -->
+  <header class="top-bar">
+    <div class="top-left">
+      <div class="avatar"></div>
+      <div class="logo-text">Market AI</div>
+    </div>
+    <div class="top-right">↗</div>
   </header>
 
-  <!-- Static snapshot based on NSE stats you shared -->
-  <section class="top-summary">
-    <div class="badge">
-      <strong>Stocks traded</strong><span>3,199</span>
-    </div>
-    <div class="badge">
-      <strong>Advances</strong><span>1,383</span>
-    </div>
-    <div class="badge">
-      <strong>Declines</strong><span>1,714</span>
-    </div>
-    <div class="badge">
-      <strong>52W High</strong><span>82</span>
-    </div>
-    <div class="badge">
-      <strong>52W Low</strong><span>138</span>
-    </div>
-    <div class="badge">
-      <strong>Market cap</strong><span>₹ 473.88L Cr · $5.34T</span>
-    </div>
-    <div class="badge">
-      <strong>Turnover (Equity)</strong><span>₹ 96,628 Cr</span>
-    </div>
-    <div class="badge">
-      <strong>Date</strong><span>20‑Nov‑2025</span>
-    </div>
-  </section>
+  <!-- center hero -->
+  <main class="hero">
+    <div class="hero-pattern"></div>
 
-  <main class="layout">
-    <!-- LEFT: Nifty 50 -->
-    <section class="panel">
-      <div class="panel-header">
-        <span>Nifty 50 (NSE)</span>
-        <a href="https://www.nseindia.com" target="_blank" rel="noopener noreferrer">Open NSE site</a>
-      </div>
-      <div class="chart-box">
-        <!-- TradingView Widget BEGIN -->
-        <div class="tradingview-widget-container">
-          <div id="nifty_chart"></div>
-          <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-          <script type="text/javascript">
-            new TradingView.widget({
-              "container_id": "nifty_chart",
-              "width": "100%",
-              "height": "100%",
-              "symbol": "NSE:NIFTY",      // Nifty 50 index, not Apple [web:134][web:143]
-              "interval": "60",
-              "timezone": "Asia/Kolkata",
-              "theme": "light",
-              "style": "1",
-              "locale": "en",
-              "toolbar_bg": "#f1f3f6",
-              "enable_publishing": false,
-              "hide_side_toolbar": false,
-              "allow_symbol_change": false
-            });
-          </script>
-        </div>
-        <!-- TradingView Widget END -->
-      </div>
-      <div class="info-card">
-        <h3>Nifty – pre‑trade checklist</h3>
-        <ul>
-          <li>Check daily &amp; 1‑hour trend (higher highs/lows or range).</li>
-          <li>Mark yesterday high/low and current day opening range.</li>
-          <li>Note nearest support &amp; resistance zones before planning entries.</li>
-          <li>Avoid aggressive trades near key events or gap‑up/gap‑down opens.</li>
-        </ul>
-      </div>
-    </section>
+    <!-- optional hidden scrollable area for future results -->
+    <div class="content" id="result-area">
+      <!-- when you add backend, answers can be shown here -->
+    </div>
 
-    <!-- RIGHT: Sensex -->
-    <section class="panel">
-      <div class="panel-header">
-        <span>Sensex (BSE)</span>
-        <a href="https://www.bseindia.com/sensex/code/16/" target="_blank" rel="noopener noreferrer">
-          Open BSE Sensex
-        </a>
-      </div>
-      <div class="chart-box">
-        <!-- TradingView Widget BEGIN -->
-        <div class="tradingview-widget-container">
-          <div id="sensex_chart"></div>
-          <script type="text/javascript">
-            new TradingView.widget({
-              "container_id": "sensex_chart",
-              "width": "100%",
-              "height": "100%",
-              "symbol": "BSE:SENSEX",    // BSE Sensex index [web:143]
-              "interval": "60",
-              "timezone": "Asia/Kolkata",
-              "theme": "light",
-              "style": "1",
-              "locale": "en",
-              "toolbar_bg": "#f1f3f6",
-              "enable_publishing": false,
-              "hide_side_toolbar": false,
-              "allow_symbol_change": false
-            });
-          </script>
-        </div>
-        <!-- TradingView Widget END -->
-      </div>
-      <div class="info-card">
-        <h3>Sensex – pre‑trade checklist</h3>
-        <ul>
-          <li>Compare Sensex trend with Nifty to confirm market bias.</li>
-          <li>Watch for divergence (one index strong, other weak).</li>
-          <li>Track banking &amp; heavyweight stocks driving the move.</li>
-          <li>Avoid trades if both indices are choppy and overlapping.</li>
-        </ul>
-      </div>
-    </section>
+    <div class="hero-inner">
+      <div class="hero-icon">✶</div>
+      <div class="hero-title">Where knowledge begins</div>
+    </div>
   </main>
 
-  <!-- Your own notes / plan area -->
-  <section class="bottom-notes">
-    <label for="notes">Your plan before entering any trade (write key points):</label>
-    <textarea id="notes" placeholder="Example: Market biased bullish above yesterday high; I will only look for pullback longs with tight risk..."></textarea>
-  </section>
+  <!-- bottom ask anything bar -->
+  <div class="bottom-shell">
+    <div class="ask-row">
+      <button class="pill-btn" title="Upload chart">📈</button>
+      <input
+        id="query"
+        class="ask-input"
+        type="text"
+        placeholder="Ask anything..."
+        autocomplete="off"
+      />
+      <button class="mic-btn" title="Voice">
+        🎙
+      </button>
+    </div>
+    <div class="bottom-nav">
+      <span>⌂</span>
+      <span>◎</span>
+      <span>✶</span>
+      <span>☺</span>
+    </div>
+  </div>
+
+  <script>
+    // Simple placeholder behaviour: echo question into result area
+    const input = document.getElementById('query');
+    const resultArea = document.getElementById('result-area');
+
+    function showTemp(text){
+      if(!text) return;
+      const p = document.createElement('p');
+      p.textContent = 'You asked: ' + text;
+      resultArea.appendChild(p);
+      resultArea.style.pointerEvents = 'auto';
+      input.value = '';
+    }
+
+    input.addEventListener('keydown', e=>{
+      if(e.key === 'Enter'){
+        e.preventDefault();
+        showTemp(input.value.trim());
+      }
+    });
+  </script>
 </body>
 </html>
